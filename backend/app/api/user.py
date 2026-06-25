@@ -18,4 +18,4 @@ def get_agents(user: user_dependency, db:db_dependency):
             detail="Not authenticated"
         )
     
-    return db.query(User).filter(User.role == 'agent').all
+    return db.query(User).filter(User.role == 'agent').all()

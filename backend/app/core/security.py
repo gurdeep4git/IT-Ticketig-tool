@@ -53,6 +53,7 @@ def set_auth_cookie(response: Response, token: str) -> None:
         secure=False, 
         samesite="lax",
         max_age=COOKIE_EXPIRY_SECONDS,
+        path="/",
     )
 
 def clear_auth_cookie(response: Response) -> None:
@@ -64,6 +65,7 @@ def clear_auth_cookie(response: Response) -> None:
         samesite="lax",
         max_age=0,
         expires=0,
+        path="/",
     )   
 
 def get_current_user(token: str = Depends(cookie_scheme)):

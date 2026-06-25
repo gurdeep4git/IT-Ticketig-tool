@@ -30,7 +30,7 @@ export const LoginForm = () => {
     return errors;
   };
 
-  const handleLogin = (event) => {
+  const handleLogin = (event: any) => {
     event.preventDefault();
     const newErrors = validate();
 
@@ -45,8 +45,9 @@ export const LoginForm = () => {
   const login = async () => {
     setApiState({ loading: true, error: null });
     try {
-      const res = await fetch("http://127.0.0.1:8000/auth/login", {
+      const res = await fetch("http://localhost:8000/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: emailRef.current?.value,

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Response
 from sqlalchemy.exc import SQLAlchemyError
 from starlette import status
 from ..core.database import db_dependency
-from ..core.security import hash_password, create_access_token, verify_password, set_auth_cookie, clear_auth_cookie
+from ..core.security import hash_password, create_access_token, verify_password, set_auth_cookie, clear_auth_cookie, user_dependency
 from ..schemas import UserCreate, LoginRequest
 from ..models import User
 
@@ -41,15 +41,7 @@ def register(db:db_dependency, user:UserCreate, response: Response):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Database transaction failed. Please try again."
         )
-
-    token = create_access_token(
-        user.email,
-        new_user.id,
-        user.role
-    )
-
-    set_auth_cookie(response=response, token=token)
-
+    
     return {
         "username": new_user.email,
         "role": new_user.role
@@ -95,5 +87,21 @@ def logout(response: Response):
     }
 
 #ME
+@router.get("/me", status_code=status.HTTP_200_OK)
+def me(user: user_dependency, db: db_dependency):
+    user_obj = db.query(User).filter(User.id == user.get("user_id")).first()
+    if not user_obj:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    return {
+        "status": True,
+        "data": {
+            "id": user_obj.id,
+            "email": user_obj.email,
+            "first_name": user_obj.first_name,
+            "last_name": user_obj.last_name,
+            "role": user_obj.role,
+        },
+    }
 
 #RESET_PASSWORD

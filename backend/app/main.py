@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from . import models
 from .core.database import engine
-from .api import auth_router, tickets_router, user_router
+from .api import auth_router, tickets_router, user_router, dashboard_router
 
 app = FastAPI()
 
@@ -22,3 +22,4 @@ app.add_middleware(
 app.include_router(auth_router) 
 app.include_router(tickets_router) 
 app.include_router(user_router) 
+app.include_router(dashboard_router) 
