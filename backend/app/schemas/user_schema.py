@@ -15,3 +15,6 @@ class UserCreate(UserBase):
 class LoginRequest(BaseModel):
     email: Annotated[str, Field(..., max_length=20)]
     password: Annotated[str, Field(max_length=15)]    
+
+class AgentsResponse(UserBase):
+    id:int    

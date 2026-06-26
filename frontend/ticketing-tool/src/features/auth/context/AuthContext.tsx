@@ -1,12 +1,25 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type User = { email: string; role: string; first_name?: string; last_name?: string };
+type User = {
+  id: number;
+  email: string;
+  role: string;
+  first_name?: string;
+  last_name?: string;
+};
+
+type ApiResponse = {
+  data: User;
+  status: boolean;
+};
 
 type AuthContextType = {
   user: User | null;
   setUser: (u: User | null) => void;
   isAuthenticated: boolean;
   isAdmin:boolean;
+  isAgent:boolean;
+  isUser:boolean;
   loading:boolean;
 };
 
@@ -27,16 +40,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
         return res.json();
       })
-      .then((data) => setUser(data))
+      .then((res: ApiResponse) => setUser(res?.data ?? null))
       .catch(() => setUser(null))
       .finally(() => setLoading(false));
   }, []);
 
   const isAuthenticated = user !== null;
   const isAdmin = user?.role === 'admin';
+  const isAgent = user?.role === 'agent';
+  const isUser = user?.role === 'user';
 
   return (
-    <AuthContext.Provider value={{ user, setUser, isAuthenticated, isAdmin, loading}}>
+    <AuthContext.Provider value={{ user, setUser, isAuthenticated, isAdmin, isAgent, isUser, loading}}>
       {children}
     </AuthContext.Provider>
   );

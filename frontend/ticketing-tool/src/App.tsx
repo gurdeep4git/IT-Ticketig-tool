@@ -5,6 +5,7 @@ import AuthLayout from "./layout/AuthLayout";
 import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./router/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import { Tickets } from "./pages/Tickets";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tickets" element={<Tickets />} />
           </Route>
         </Route>
 

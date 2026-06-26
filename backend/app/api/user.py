@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from starlette import status
-from ..schemas.user_schema import UserBase
+from ..schemas.user_schema import AgentsResponse, UserBase
 from ..core.security import user_dependency
 from ..core.database import db_dependency
 from ..models import User
@@ -10,7 +10,7 @@ router = APIRouter(
     tags=["User"]
 )
 
-@router.get('/agents', status_code=status.HTTP_200_OK, response_model=list[UserBase])
+@router.get('/agents', status_code=status.HTTP_200_OK, response_model=list[AgentsResponse])
 def get_agents(user: user_dependency, db:db_dependency):
     if not user:
         raise HTTPException(

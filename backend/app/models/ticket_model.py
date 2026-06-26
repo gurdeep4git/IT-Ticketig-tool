@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..core.database import Base
 
 
@@ -18,3 +18,5 @@ class Ticket(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime)
     created_by: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"))
     assigned_to: Mapped[int | None] = mapped_column(Integer, ForeignKey("users.id"), nullable=True)
+
+    assignee = relationship("User", foreign_keys=[assigned_to])

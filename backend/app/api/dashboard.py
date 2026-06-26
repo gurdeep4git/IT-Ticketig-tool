@@ -56,10 +56,10 @@ def get_dashboard_stats(user:user_dependency, db:db_dependency):
     top_agents = None
     if user["role"] == "admin":
         agent_rows = (
-            db.query(User.id, User.email, func.count(Ticket.id))
+            db.query(User.email, func.count(Ticket.id))
             .join(Ticket, Ticket.assigned_to == User.id)
             .filter(Ticket.status == "done")
-            .group_by(User.id, User.email)
+            .group_by(User.email)
             .order_by(func.count(Ticket.id).desc())
             .all()
         )
