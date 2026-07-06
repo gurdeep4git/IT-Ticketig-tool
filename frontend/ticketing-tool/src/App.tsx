@@ -6,6 +6,7 @@ import DashboardLayout from "./layout/DashboardLayout";
 import ProtectedRoute from "./router/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import { Tickets } from "./pages/Tickets";
+import { AddTicket } from "./features/tickets/components/AddTicket";
 
 function App() {
   return (
@@ -20,6 +21,8 @@ function App() {
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tickets" element={<Tickets />} />
+            <Route path="/tickets/add" element={<AddTicket />} />
+            {/* <Route path="/tickets/edit/:id" element={<EditTicket />} /> */}
           </Route>
         </Route>
 

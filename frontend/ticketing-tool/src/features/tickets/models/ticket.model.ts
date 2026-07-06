@@ -11,3 +11,9 @@ export interface Ticket {
   assigned_to: number;
   assignee: any;
 }
+
+export interface TicketFormValues {
+  title: string;
+  description: string;
+  priority: "low" | "medium" | "high";
+}

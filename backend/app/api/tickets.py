@@ -1,7 +1,9 @@
 
+from io import BytesIO
 import uuid
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, File, HTTPException, UploadFile
+import pandas as pd
 from sqlalchemy.exc import IntegrityError
 from starlette import status
 from ..enums.enum import TicketStatus, TicketPriority
@@ -317,6 +319,62 @@ def delete_ticket(ticket_id: int, user: user_dependency, db: db_dependency):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Something went wrong"
         )
+    
+@router.post('/bulk-upload', status_code=status.HTTP_200_OK)
+async def bulk_upload(user: user_dependency, db: db_dependency, file: UploadFile = File(...)):
+    if user['role'] != 'admin':
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail= "Only the admin can bulk upload ticket"
+        )
+    
+    if not file.filename.endswith((".xlsx", ".xls")):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= "only excel file is allowed"
+        )
+    
+    contents = await file.read()
+
+    try:
+        df = pd.read_excel(BytesIO(contents))
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= f"Could not parse Excel file: {e}"
+        )
+    
+    required_cols = {'title', 'description', 'priority'}
+    if not required_cols.issubset(set(df.columns.str.lower())):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail= f"Excel must contain columns: {required_cols}"
+        )
+    
+    tickets_created = 0
+    for _, row in df.iterrows():
+        ticket = Ticket(
+            ticket_number=generate_ticket_number(),
+            title=row["title"],
+            description=row.get("description", ""),
+            priority=row.get("priority", "medium"),
+            status=row.get("status", "open"),
+            created_by= row.get("createdby", ""),      
+            assigned_to= None,               
+            created_at= datetime.utcnow(),
+            updated_at= datetime.utcnow()
+        )
+        db.add(ticket)
+        tickets_created += 1
+
+    db.commit()
+
+    return {"message": f"{tickets_created} tickets uploaded successfully"}
+
+    
+
+
+
 
 
 

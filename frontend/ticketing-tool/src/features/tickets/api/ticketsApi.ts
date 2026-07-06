@@ -36,6 +36,7 @@ export const ticketsApi = {
   create: async (payload: any): Promise<Ticket> => {
     const res = await fetch(BASE_URL, {
       method: "POST",
+      credentials:'include',
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });

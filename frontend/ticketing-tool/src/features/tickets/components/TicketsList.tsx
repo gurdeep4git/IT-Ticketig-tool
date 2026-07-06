@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useAuth } from "../../auth/context/AuthContext";
 import { useUsers } from "../../users/hooks/useUsers";
 import { useTickets } from "../hooks/useTickets";
@@ -7,15 +8,24 @@ import { PriorityBadge } from "./PriorityBadge";
 import { StatusBadge } from "./StatusBadge";
 
 export const TicketsList = () => {
-  const { tickets, statuses, isLoading, error, assignAgent, assignStatus } = useTickets();
+  const { tickets, statuses, isLoading, error, assignAgent, assignStatus } =
+    useTickets();
   const { agents } = useUsers();
-  const { isAgent, isUser } = useAuth();
+  const { isAgent, isUser, isAdmin } = useAuth();
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
     <>
+      <h1 className="text-3xl font-bold mb-3">Tickets</h1>
+      {(isAdmin || isUser) && (
+        <div className="flex justify-end mb-3">
+          <Link to={"/tickets/add"}>
+            <button className="btn btn-info">Create Ticket</button>
+          </Link>
+        </div>
+      )}
       <div className="overflow-x-auto rounded-lg border border-gray-200 shadow-sm">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -61,27 +71,32 @@ export const TicketsList = () => {
                   {ticket.description}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
-                  {isUser ? <StatusBadge status={ticket.status} /> : <ChangeStatus
-                        ticketId={ticket.id}
-                        statuses={statuses}
-                        currentStatus={ticket.status}
-                        onChangeStatus={assignStatus}/>}
+                  {isUser ? (
+                    <StatusBadge status={ticket.status} />
+                  ) : (
+                    <ChangeStatus
+                      ticketId={ticket.id}
+                      statuses={statuses}
+                      currentStatus={ticket.status}
+                      onChangeStatus={assignStatus}
+                    />
+                  )}
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap">
                   <PriorityBadge priority={ticket.priority} />
                 </td>
                 {!isAgent && (
                   <td className="px-4 py-3 text-sm text-gray-600">
-                    {ticket.assignee ? (
-                      `${ticket.assignee.first_name} ${ticket.assignee.last_name}`
-                    ) : (
+                    {isAdmin ? (
                       <AddAssignee
                         ticketId={ticket.id}
                         agents={agents}
                         currentAgentId={ticket.assigned_to}
                         onAssign={assignAgent}
                       />
-                    )}
+                    ) : ticket.assignee ? (
+                      `${ticket.assignee.first_name} ${ticket.assignee.last_name}`
+                    ) : '-'}
                   </td>
                 )}
                 <td className="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">

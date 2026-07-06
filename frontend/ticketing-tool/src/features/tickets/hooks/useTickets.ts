@@ -1,7 +1,7 @@
 // features/tickets/hooks/useTickets.ts
 import { useState, useEffect, useCallback } from 'react';
 import { ticketsApi } from '../api/ticketsApi';
-import type { Ticket } from '../models/ticket.model';
+import type { Ticket, TicketFormValues } from '../models/ticket.model';
 
 
 interface UseTicketsParams {
@@ -17,6 +17,7 @@ interface UseTicketsResult {
   refetch: () => void;
   assignAgent: (ticketId: number, agentId: number) => Promise<void>;
   assignStatus: (ticketId: number, status: string) => Promise<void>;
+  createTicket: (data :TicketFormValues) => Promise<void>;
 }
 
 export function useTickets(params?: UseTicketsParams): UseTicketsResult {
@@ -73,10 +74,25 @@ export function useTickets(params?: UseTicketsParams): UseTicketsResult {
     }
   }, []);
 
+  const createTicket = async(data:TicketFormValues) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+        const ticket = await ticketsApi.create(data);
+        return ticket;
+    } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to create ticket');
+        throw err;
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+
   useEffect(() => {
     fetchTickets();
     fetchStatuses();
   }, [fetchTickets]);
 
-  return { tickets, statuses, isLoading, error, refetch: fetchTickets, assignAgent, assignStatus  };
+  return { tickets, statuses, isLoading, error, refetch: fetchTickets, assignAgent, assignStatus, createTicket };
 }
